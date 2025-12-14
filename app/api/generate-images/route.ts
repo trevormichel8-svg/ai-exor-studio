@@ -58,9 +58,13 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ STYLE SAFETY
-    const safeStyle = ART_STYLES.includes(style)
-      ? style
-      : "Modern Flat";
+  const resolvedStyle =
+  typeof style === "string" ? style : "Modern Flat";
+
+const safeStyle: ArtStyle = ART_STYLES.includes(resolvedStyle as ArtStyle)
+  ? (resolvedStyle as ArtStyle)
+  : "Modern Flat";
+
 
     const finalPrompt = `
 Logo design in ${safeStyle} style.

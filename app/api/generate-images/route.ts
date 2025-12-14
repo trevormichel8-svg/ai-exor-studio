@@ -1,3 +1,4 @@
+import { ART_STYLES } from "@/lib/art-styles";
 import { NextRequest, NextResponse } from "next/server";
 import { ImageModel, experimental_generateImage as generateImage } from "ai";
 import { openai } from "@ai-sdk/openai";
@@ -46,20 +47,30 @@ const withTimeout = <T>(promise: Promise<T>, timeoutMillis: number): Promise<T> 
 export async function POST(req: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
 
-  const { prompt, provider, modelId } =
-    (await req.json()) as GenerateImageRequest;
-
   try {
+    const { prompt, style, provider, modelId } =
+      (await req.json()) as GenerateImageRequest;
+
     if (!prompt || !provider || !providerConfig[provider]) {
       const error = "Invalid request parameters";
       console.error(`${error} [requestId=${requestId}]`);
       return NextResponse.json({ error }, { status: 400 });
     }
 
+    // ✅ STYLE SAFETY
+    const safeStyle = ART_STYLES.includes(style)
+      ? style
+      : "Modern Flat";
+
+    const finalPrompt = `
+Logo design in ${safeStyle} style.
+${prompt}.
+High quality, professional logo, centered, clean background.
+`.trim();
+
     const config = providerConfig[provider];
 
-    // ✅ CRITICAL FIX:
-    // OpenAI image generation ONLY supports gpt-image-1
+    // ✅ FORCE OpenAI image model
     const resolvedModelId =
       provider === "openai" ? "gpt-image-1" : modelId;
 
@@ -74,13 +85,18 @@ export async function POST(req: NextRequest) {
 
     const generatePromise = generateImage({
       model: config.createImageModel(resolvedModelId),
-      prompt,
+
+      // ✅ USE FINAL PROMPT (THIS WAS THE BUG)
+      prompt: finalPrompt,
+
       ...(config.dimensionFormat === "size"
         ? { size: DEFAULT_IMAGE_SIZE }
         : { aspectRatio: DEFAULT_ASPECT_RATIO }),
+
       ...(provider !== "openai" && {
         seed: Math.floor(Math.random() * 1_000_000),
       }),
+
       providerOptions: {
         vertex: { addWatermark: false },
       },
@@ -106,11 +122,11 @@ export async function POST(req: NextRequest) {
     });
 
     const result = await withTimeout(generatePromise, TIMEOUT_MILLIS);
-
     return NextResponse.json(result, { status: 200 });
+
   } catch (error) {
     console.error(
-      `❌ Image generation failed [requestId=${requestId}, provider=${provider}]:`,
+      `❌ Image generation failed [requestId=${requestId}]:`,
       error
     );
 
@@ -124,4 +140,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+  }

@@ -11,6 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        /* ✅ Existing shadcn / CSS-variable system */
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -51,12 +52,28 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+
+        /* ✅ YOUR CUSTOM BRAND COLORS (ADDED SAFELY) */
+        bg: {
+          dark: "#020B08",      // greenish black
+          darkSoft: "#061512",
+        },
+        gold: {
+          DEFAULT: "#D4AF37",
+          soft: "#E6C76A",
+        },
+        turquoise: {
+          DEFAULT: "#2ED3C6",
+          soft: "#7FE6DC",
+        },
       },
+
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+
       fontFamily: {
         sans: ["var(--font-geist-sans)"],
         mono: ["var(--font-geist-mono)"],
@@ -65,4 +82,6 @@ const config: Config = {
   },
   plugins: [tailwindcssAnimate],
 };
+
 export default config;
+        

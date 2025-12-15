@@ -58,11 +58,10 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ STYLE SAFETY
-  const resolvedStyle =
-  typeof style === "string" ? style : "Modern Flat";
+const normalizedStyle = style ?? "Modern Flat";
 
-const safeStyle: ArtStyle = ART_STYLES.includes(resolvedStyle as ArtStyle)
-  ? (resolvedStyle as ArtStyle)
+const safeStyle = ART_STYLES.includes(normalizedStyle)
+  ? normalizedStyle
   : "Modern Flat";
 
 

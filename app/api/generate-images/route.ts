@@ -1,13 +1,13 @@
 import { experimental_generateImage } from "ai";
 import { NextResponse } from "next/server";
 import { GenerateImagesSchema } from "@/lib/schemas/generate-images.schema";
-import type { ImageModelV1 } from "ai";
+import type { ImageModel } from "ai";
 
 export const runtime = "edge";
 
 const MODEL_MAP: Record<
   "openai" | "fireworks" | "replicate" | "vertex",
-  ImageModelV1> = {
+  ImageModel> = {
   openai: "gpt-image-1",
   fireworks: "stable-diffusion-xl-1024-v1-0",
   replicate: "stability-ai/sdxl",

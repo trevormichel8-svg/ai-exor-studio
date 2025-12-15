@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
   try {
     const result = await experimental_generateImage({
-      model: MODEL_MAP[provider],
+      model: MODEL_MAP[ImageModelV1],
       prompt: `${prompt}, style: ${style}`,
       size,
       abortSignal: controller.signal,
